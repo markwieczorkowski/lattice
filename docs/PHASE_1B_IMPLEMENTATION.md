@@ -258,11 +258,33 @@ src/
 
 ## Configuration
 
-### Change Grid Size
-Edit `useBoardStore.js`:
+### Board Dimensions and Grid Alignment
+
+**IMPORTANT:** Board dimensions must be exactly divisible by gridSize to prevent grid drift.
+
+Current configuration in `useBoardStore.js`:
 ```javascript
 board: {
-  gridSize: 30  // Change to desired size (e.g., 40, 50)
+  width: 2550,   // 85 columns × 30px
+  height: 2040,  // 68 rows × 30px
+  gridSize: 30
+}
+```
+
+**Why this matters:**
+- RGL calculates column width as `width / cols`
+- If not exactly divisible, RGL columns drift from visual grid
+- Example: 2560 / 85 = 30.117647px (causes rightward drift)
+- Solution: 2550 / 85 = 30.000000px (perfect alignment)
+
+### Change Grid Size
+When changing gridSize, ensure dimensions remain divisible:
+```javascript
+// Example: 40px grid
+board: {
+  width: 2560,   // 64 columns × 40px
+  height: 2040,  // 51 rows × 40px
+  gridSize: 40
 }
 ```
 

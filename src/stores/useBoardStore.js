@@ -9,8 +9,8 @@ const useBoardStore = create((set) => ({
   board: {
     id: 'default-board',
     name: 'My Board',
-    width: 2560,  // pixels
-    height: 2048, // pixels
+    width: 2550,  // pixels (85 columns × 30px = exactly divisible by gridSize)
+    height: 2040, // pixels (68 rows × 30px = exactly divisible by gridSize)
     gridSize: 30, // pixels (for both columns and rows)
     background: '#808080', // neutral gray
     overlapMode: 'overlap', // 'overlap' | 'no-overlap' | 'bump'

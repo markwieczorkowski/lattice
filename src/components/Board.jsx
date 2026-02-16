@@ -70,9 +70,19 @@ const Board = ({ placementMode, onPlacementComplete }) => {
   };
 
   /**
-   * Check if placement would collide with existing components
+   * Check if placement would collide with existing components or exceed board boundaries
    */
   const wouldCollide = (x, y, w, h) => {
+    // Calculate max columns and rows
+    const maxCols = board.width / board.gridSize;
+    const maxRows = board.height / board.gridSize;
+
+    // Check board boundaries
+    if (x < 0 || y < 0 || x + w > maxCols || y + h > maxRows) {
+      return true;
+    }
+
+    // Check collision with existing components
     const componentList = Object.values(components);
     for (const comp of componentList) {
       const { x: cx, y: cy, w: cw, h: ch } = comp.layout;
@@ -219,8 +229,10 @@ const Board = ({ placementMode, onPlacementComplete }) => {
    */
   const boardTransform = `translate(${viewport.panX}px, ${viewport.panY}px) scale(${viewport.zoom})`;
 
-  // Calculate columns based on board width and grid size
-  const cols = Math.floor(board.width / board.gridSize);
+  // Calculate columns and rows based on board dimensions and grid size
+  // Must be exact division to prevent grid drift
+  const cols = board.width / board.gridSize;  // 2550 / 30 = 85 columns
+  const rows = board.height / board.gridSize; // 2040 / 30 = 68 rows
 
   return (
     <div
@@ -271,6 +283,7 @@ const Board = ({ placementMode, onPlacementComplete }) => {
           cols={{ lg: cols }}
           rowHeight={board.gridSize}
           width={board.width}
+          maxRows={rows}
           onLayoutChange={handleLayoutChange}
           compactType={null}
           preventCollision={true}
@@ -279,6 +292,7 @@ const Board = ({ placementMode, onPlacementComplete }) => {
           margin={[0, 0]}
           containerPadding={[0, 0]}
           useCSSTransforms={true}
+          transformScale={1}
         >
           {Object.values(components).map((component) => (
             <div key={component.id} data-grid={component.layout}>
