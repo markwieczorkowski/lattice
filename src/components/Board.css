@@ -30,3 +30,47 @@
 .board-grid {
   user-select: none;
 }
+
+/* Placement mode cursor */
+.board-placing {
+  cursor: crosshair !important;
+}
+
+/* React Grid Layout container */
+.rgl-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allow clicks through to board when not interacting with components */
+}
+
+.rgl-container .react-grid-layout {
+  pointer-events: none;
+}
+
+.rgl-container .react-grid-item {
+  pointer-events: auto; /* Components themselves receive events */
+}
+
+/* Component shadow preview */
+.component-shadow {
+  position: absolute;
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 999;
+  transition: all 0.1s ease;
+}
+
+.component-shadow.can-place {
+  background: rgba(76, 175, 80, 0.3);
+  border: 2px solid rgba(76, 175, 80, 0.8);
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.component-shadow.cannot-place {
+  background: rgba(244, 67, 54, 0.3);
+  border: 2px solid rgba(244, 67, 54, 0.8);
+  box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+}

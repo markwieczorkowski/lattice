@@ -50,7 +50,7 @@ const useBoardStore = create((set) => ({
       viewport: { ...state.viewport, zoom },
     })),
 
-  // Component management (scaffolding for later phases)
+  // Component management
   addComponent: (component) =>
     set((state) => ({
       components: {
@@ -71,6 +71,41 @@ const useBoardStore = create((set) => ({
     set((state) => {
       const { [id]: removed, ...rest } = state.components;
       return { components: rest };
+    }),
+
+  // Update component layout (from RGL drag/resize events)
+  updateComponentLayout: (id, layout) =>
+    set((state) => {
+      if (!state.components[id]) return state;
+      return {
+        components: {
+          ...state.components,
+          [id]: {
+            ...state.components[id],
+            layout: { ...state.components[id].layout, ...layout },
+          },
+        },
+      };
+    }),
+
+  // Batch update all component layouts (from RGL onLayoutChange)
+  updateAllLayouts: (layouts) =>
+    set((state) => {
+      const updatedComponents = { ...state.components };
+      layouts.forEach((layout) => {
+        if (updatedComponents[layout.i]) {
+          updatedComponents[layout.i] = {
+            ...updatedComponents[layout.i],
+            layout: {
+              x: layout.x,
+              y: layout.y,
+              w: layout.w,
+              h: layout.h,
+            },
+          };
+        }
+      });
+      return { components: updatedComponents };
     }),
 
   // Persistence helpers (for Phase 1E)
