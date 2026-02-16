@@ -1,0 +1,17 @@
+.viewport {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Hide content outside viewport */
+  background-color: #2a2a2a; /* Very dark gray for border space */
+}
+
+/* Prevent text selection during dragging */
+.viewport {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}

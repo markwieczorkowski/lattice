@@ -1,0 +1,32 @@
+.board {
+  position: absolute;
+  transform-origin: top left;
+  transition: none; /* No transition for smooth real-time panning */
+  will-change: transform; /* Performance optimization for transforms */
+}
+
+.board-panning {
+  cursor: grabbing;
+}
+
+.board:not(.board-panning) {
+  cursor: grab;
+}
+
+/* Grid overlay for visual testing (Phase 1A) */
+.board-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(to right, rgba(200, 200, 200, 0.3) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(200, 200, 200, 0.3) 1px, transparent 1px);
+  pointer-events: none; /* Allow click-through to board */
+}
+
+/* Ensure grid doesn't interfere with panning */
+.board-grid {
+  user-select: none;
+}
