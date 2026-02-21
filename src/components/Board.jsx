@@ -294,11 +294,21 @@ const Board = ({ placementMode, onPlacementComplete }) => {
           useCSSTransforms={true}
           transformScale={1}
         >
-          {Object.values(components).map((component) => (
-            <div key={component.id} data-grid={component.layout}>
-              <ComponentTile component={component} />
-            </div>
-          ))}
+          {Object.values(components).map((component) => {
+            const componentType = getComponentType(component.type);
+            return (
+              <div 
+                key={component.id} 
+                data-grid={{
+                  ...component.layout,
+                  minW: componentType?.minWidth || 2,
+                  minH: componentType?.minHeight || 2,
+                }}
+              >
+                <ComponentTile component={component} />
+              </div>
+            );
+          })}
         </ResponsiveGridLayout>
       </div>
     </div>
