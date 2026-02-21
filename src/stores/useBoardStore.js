@@ -22,7 +22,7 @@ const useBoardStore = create((set) => ({
       imageUrl: null, // For image type
       imageName: null, // Display name for uploaded images
     },
-    overlapMode: 'overlap', // 'overlap' | 'no-overlap' | 'bump'
+    overlapMode: 'no-overlap', // 'no-overlap' | 'overlap' | 'bump' (displayed as "Push Down")
   },
 
   // Uploaded images storage

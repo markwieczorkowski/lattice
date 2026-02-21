@@ -22,6 +22,7 @@ const BoardSettingsDialog = ({ onClose }) => {
   const [currentBoard, setCurrentBoard] = useState('default');
   const [showTestControls, setShowTestControls] = useState(board.showTestControls);
   const [showGrid, setShowGrid] = useState(board.showGrid);
+  const [overlapMode, setOverlapMode] = useState(board.overlapMode);
   const [width, setWidth] = useState(board.width);
   const [height, setHeight] = useState(board.height);
   const [backgroundType, setBackgroundType] = useState(board.background.type);
@@ -48,6 +49,7 @@ const BoardSettingsDialog = ({ onClose }) => {
     updateBoard({
       showTestControls,
       showGrid,
+      overlapMode,
       width: newWidth,
       height: newHeight,
       background: {
@@ -156,6 +158,25 @@ const BoardSettingsDialog = ({ onClose }) => {
               />
               <span>Show Grid</span>
             </label>
+          </div>
+
+          {/* Overlap Mode */}
+          <div className="settings-section">
+            <label className="settings-label">Overlap Mode</label>
+            <select 
+              className="settings-select"
+              value={overlapMode}
+              onChange={(e) => setOverlapMode(e.target.value)}
+            >
+              <option value="no-overlap">No Overlap</option>
+              <option value="overlap">Overlap</option>
+              <option value="bump">Push Down</option>
+            </select>
+            <div className="settings-hint">
+              {overlapMode === 'no-overlap' && 'Components cannot overlap each other'}
+              {overlapMode === 'overlap' && 'Components can freely overlap'}
+              {overlapMode === 'bump' && 'Components push others downward when moved into occupied space'}
+            </div>
           </div>
 
           {/* Board Size */}

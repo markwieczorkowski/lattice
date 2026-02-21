@@ -93,18 +93,24 @@ const Board = ({ placementMode, onPlacementComplete }) => {
 
   /**
    * Check if placement would collide with existing components or exceed board boundaries
+   * Respects current overlap mode setting
    */
   const wouldCollide = (x, y, w, h) => {
     // Calculate max columns and rows
     const maxCols = board.width / board.gridSize;
     const maxRows = board.height / board.gridSize;
 
-    // Check board boundaries
+    // Always check board boundaries
     if (x < 0 || y < 0 || x + w > maxCols || y + h > maxRows) {
       return true;
     }
 
-    // Check collision with existing components
+    // In overlap mode, allow placement anywhere within bounds
+    if (board.overlapMode === 'overlap') {
+      return false;
+    }
+
+    // Check collision with existing components (no-overlap and bump modes)
     const componentList = Object.values(components);
     for (const comp of componentList) {
       const { x: cx, y: cy, w: cw, h: ch } = comp.layout;
@@ -316,6 +322,42 @@ const Board = ({ placementMode, onPlacementComplete }) => {
   const cols = board.width / board.gridSize;  // 2550 / 30 = 85 columns
   const rows = board.height / board.gridSize; // 2040 / 30 = 68 rows
 
+  /**
+   * Get RGL configuration based on overlap mode
+   */
+  const getRGLConfig = () => {
+    switch (board.overlapMode) {
+      case 'no-overlap':
+        return {
+          allowOverlap: false,
+          preventCollision: true,
+          compactType: null,
+        };
+      
+      case 'overlap':
+        return {
+          allowOverlap: true,
+          preventCollision: false,
+          compactType: null,
+        };
+      
+      case 'bump':
+        return {
+          allowOverlap: false,
+          preventCollision: false,
+          compactType: null, // No auto-compaction, just push on collision
+        };
+      
+      default:
+        return {
+          allowOverlap: false,
+          preventCollision: true,
+          compactType: null,
+        };
+    }
+  };
+
+  const rglConfig = getRGLConfig();
   const boardBackground = getBoardBackground();
   const isImageBackground = board.background.type === 'image';
   const panEnabled = isPanningEnabled();
@@ -382,8 +424,9 @@ const Board = ({ placementMode, onPlacementComplete }) => {
           width={board.width}
           maxRows={rows}
           onLayoutChange={handleLayoutChange}
-          compactType={null}
-          preventCollision={true}
+          compactType={rglConfig.compactType}
+          preventCollision={rglConfig.preventCollision}
+          allowOverlap={rglConfig.allowOverlap}
           isDraggable={!placementMode}
           isResizable={!placementMode}
           margin={[0, 0]}
