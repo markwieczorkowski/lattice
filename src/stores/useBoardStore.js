@@ -60,12 +60,23 @@ const useBoardStore = create((set) => ({
     })),
 
   updateComponent: (id, updates) =>
-    set((state) => ({
-      components: {
-        ...state.components,
-        [id]: { ...state.components[id], ...updates },
-      },
-    })),
+    set((state) => {
+      if (!state.components[id]) return state;
+      
+      const component = state.components[id];
+      return {
+        components: {
+          ...state.components,
+          [id]: {
+            ...component,
+            ...updates,
+            // Deep merge style and content objects
+            style: updates.style ? { ...component.style, ...updates.style } : component.style,
+            content: updates.content ? { ...component.content, ...updates.content } : component.content,
+          },
+        },
+      };
+    }),
 
   removeComponent: (id) =>
     set((state) => {

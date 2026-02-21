@@ -1,0 +1,97 @@
+.component-menu {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 100;
+  pointer-events: auto; /* Ensure menu captures events */
+}
+
+.component-menu-button {
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  background: rgba(64, 64, 64, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  color: #ffffff;
+  pointer-events: auto; /* Ensure button captures clicks */
+  backdrop-filter: blur(4px);
+}
+
+.component-menu-button:hover {
+  background: rgba(64, 64, 64, 0.9);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.component-menu-button:active {
+  transform: scale(0.95);
+}
+
+.component-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: rgba(64, 64, 64, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  min-width: 140px;
+  animation: menuSlideIn 0.15s ease;
+  pointer-events: auto; /* Ensure dropdown captures clicks */
+  backdrop-filter: blur(8px);
+}
+
+@keyframes menuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.component-menu-item {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #ffffff;
+  transition: background 0.1s ease;
+}
+
+.component-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.component-menu-item:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.component-menu-item-danger {
+  color: #ff6b6b;
+}
+
+.component-menu-item-danger:hover {
+  background: rgba(255, 107, 107, 0.2);
+}
+
+.menu-item-icon {
+  font-size: 16px;
+  line-height: 1;
+}

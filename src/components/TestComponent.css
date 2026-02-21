@@ -1,7 +1,6 @@
 .test-component {
   width: 100%;
   height: 100%;
-  background-color: rgba(64, 64, 64, 0.5); /* Dark gray, 50% opacity */
   border: 2px solid white;
   border-radius: 8px;
   display: flex;
@@ -10,24 +9,26 @@
   justify-content: center;
   padding: 10px;
   box-sizing: border-box;
-  pointer-events: auto; /* Ensure component receives events */
+  pointer-events: auto;
+  /* Background color and text color applied via inline styles */
 }
 
 .test-component h2 {
-  color: white;
   font-size: 16px;
   font-weight: 600;
   margin: 0 0 8px 0;
   text-align: center;
   user-select: none;
+  /* Color applied via inline style */
 }
 
 .test-component-id {
-  color: rgba(255, 255, 255, 0.7);
+  opacity: 0.7;
   font-size: 11px;
   font-family: 'Courier New', monospace;
   text-align: center;
   user-select: none;
   word-break: break-all;
   max-width: 100%;
+  /* Color applied via inline style */
 }
