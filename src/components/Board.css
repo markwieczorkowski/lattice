@@ -9,8 +9,13 @@
   cursor: grabbing;
 }
 
-.board:not(.board-panning) {
+.board:not(.board-panning):not(.board-placing) {
   cursor: grab;
+}
+
+/* Board smaller than viewport - show normal cursor instead of grab */
+.board.board-no-pan {
+  cursor: default;
 }
 
 /* Grid overlay for visual testing (Phase 1A) */

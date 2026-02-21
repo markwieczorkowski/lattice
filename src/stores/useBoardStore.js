@@ -12,9 +12,21 @@ const useBoardStore = create((set) => ({
     width: 2550,  // pixels (85 columns × 30px = exactly divisible by gridSize)
     height: 2040, // pixels (68 rows × 30px = exactly divisible by gridSize)
     gridSize: 30, // pixels (for both columns and rows)
-    background: '#808080', // neutral gray
+    showTestControls: true, // Show/hide test controls panel
+    showGrid: true, // Show/hide grid lines
+    background: {
+      type: 'solid', // 'solid' | 'gradient' | 'image'
+      solidColor: '#808080', // For solid type
+      gradientColors: ['#808080', '#606060'], // For gradient type [color1, color2]
+      gradientDirection: 'vertical', // 'horizontal' | 'vertical' | 'diagonal'
+      imageUrl: null, // For image type
+      imageName: null, // Display name for uploaded images
+    },
     overlapMode: 'overlap', // 'overlap' | 'no-overlap' | 'bump'
   },
+
+  // Uploaded images storage
+  uploadedImages: {},
 
   // Viewport State (panning and zoom)
   viewport: {
@@ -28,9 +40,28 @@ const useBoardStore = create((set) => ({
 
   // Actions for updating board configuration
   updateBoard: (updates) =>
-    set((state) => ({
-      board: { ...state.board, ...updates },
-    })),
+    set((state) => {
+      const newBoard = { ...state.board, ...updates };
+      
+      // If board size changed, reset pan position appropriately
+      if (updates.width !== undefined || updates.height !== undefined) {
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const boardWidth = newBoard.width;
+        const boardHeight = newBoard.height;
+        
+        // Calculate centered position for dimensions smaller than viewport
+        const panX = boardWidth < viewportWidth ? (viewportWidth - boardWidth) / 2 : 0;
+        const panY = boardHeight < viewportHeight ? (viewportHeight - boardHeight) / 2 : 0;
+        
+        return {
+          board: newBoard,
+          viewport: { ...state.viewport, panX, panY },
+        };
+      }
+      
+      return { board: newBoard };
+    }),
 
   // Actions for updating viewport (panning)
   setViewportPan: (panX, panY) =>
@@ -119,6 +150,15 @@ const useBoardStore = create((set) => ({
       return { components: updatedComponents };
     }),
 
+  // Add uploaded image
+  addUploadedImage: (name, dataUrl) =>
+    set((state) => ({
+      uploadedImages: {
+        ...state.uploadedImages,
+        [name]: dataUrl,
+      },
+    })),
+
   // Persistence helpers (for Phase 1E)
   saveToLocalStorage: () => {
     const state = useBoardStore.getState();
@@ -126,6 +166,7 @@ const useBoardStore = create((set) => ({
       board: state.board,
       viewport: state.viewport,
       components: state.components,
+      uploadedImages: state.uploadedImages,
     }));
   },
 
@@ -133,10 +174,29 @@ const useBoardStore = create((set) => ({
     const saved = localStorage.getItem('spatial-board-state');
     if (saved) {
       const data = JSON.parse(saved);
+      const defaultState = useBoardStore.getState();
+      
+      // Migrate old background format if needed
+      let boardData = data.board || defaultState.board;
+      if (boardData.background && typeof boardData.background === 'string') {
+        boardData = {
+          ...boardData,
+          background: {
+            type: 'solid',
+            solidColor: boardData.background,
+            gradientColors: [boardData.background, '#606060'],
+            gradientDirection: 'vertical',
+            imageUrl: null,
+            imageName: null,
+          },
+        };
+      }
+      
       set({
-        board: data.board || useBoardStore.getState().board,
-        viewport: data.viewport || useBoardStore.getState().viewport,
+        board: boardData,
+        viewport: data.viewport || defaultState.viewport,
         components: data.components || {},
+        uploadedImages: data.uploadedImages || {},
       });
     }
   },

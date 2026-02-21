@@ -3,6 +3,7 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import useBoardStore from '../stores/useBoardStore';
 import ComponentTile from './ComponentTile';
 import { getComponentType, generateComponentId } from '../utils/componentRegistry';
+import { migrateBackgroundFormat } from '../utils/backgroundUtils';
 import './Board.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -26,19 +27,40 @@ const Board = ({ placementMode, onPlacementComplete }) => {
 
   /**
    * Calculate pan boundaries to prevent board from moving too far out of view
-   * Allows maximum of one grid square (gridSize) of empty space past board edges
+   * Handles both oversized boards (allow panning) and undersized boards (center-lock)
    */
   const getPanBoundaries = () => {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const { width: boardWidth, height: boardHeight, gridSize } = board;
 
-    return {
-      maxX: gridSize, // Allow one grid square visible on left
-      minX: -(boardWidth - viewportWidth + gridSize), // Allow one grid square visible on right
-      maxY: gridSize, // Allow one grid square visible on top
-      minY: -(boardHeight - viewportHeight + gridSize), // Allow one grid square visible on bottom
-    };
+    // For horizontal panning
+    let maxX, minX;
+    if (boardWidth <= viewportWidth) {
+      // Board smaller than viewport - center and lock
+      const centerX = (viewportWidth - boardWidth) / 2;
+      maxX = centerX;
+      minX = centerX;
+    } else {
+      // Board larger than viewport - allow panning with boundary
+      maxX = gridSize;
+      minX = -(boardWidth - viewportWidth + gridSize);
+    }
+
+    // For vertical panning
+    let maxY, minY;
+    if (boardHeight <= viewportHeight) {
+      // Board smaller than viewport - center and lock
+      const centerY = (viewportHeight - boardHeight) / 2;
+      maxY = centerY;
+      minY = centerY;
+    } else {
+      // Board larger than viewport - allow panning with boundary
+      maxY = gridSize;
+      minY = -(boardHeight - viewportHeight + gridSize);
+    }
+
+    return { maxX, minX, maxY, minY };
   };
 
   /**
@@ -95,6 +117,21 @@ const Board = ({ placementMode, onPlacementComplete }) => {
   };
 
   /**
+   * Check if panning is enabled (board larger than viewport)
+   */
+  const isPanningEnabled = () => {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const { width: boardWidth, height: boardHeight } = board;
+    
+    return {
+      horizontal: boardWidth > viewportWidth,
+      vertical: boardHeight > viewportHeight,
+      any: boardWidth > viewportWidth || boardHeight > viewportHeight,
+    };
+  };
+
+  /**
    * Handle mouse down - start panning or handle placement
    * Only pan when clicking on empty board space (not in placement mode)
    */
@@ -102,6 +139,12 @@ const Board = ({ placementMode, onPlacementComplete }) => {
     // If in placement mode, handle component placement
     if (placementMode) {
       return; // Click will be handled by handleClick
+    }
+
+    // Check if panning is enabled for this board size
+    const panEnabled = isPanningEnabled();
+    if (!panEnabled.any) {
+      return; // Board fits in viewport, no panning needed
     }
 
     // Only pan if clicking directly on the board element or grid (not RGL components)
@@ -225,6 +268,45 @@ const Board = ({ placementMode, onPlacementComplete }) => {
   };
 
   /**
+   * Calculate board background style based on configuration
+   * Handles migration from old format
+   */
+  const getBoardBackground = () => {
+    const bg = migrateBackgroundFormat(board.background);
+    const { type, solidColor, gradientColors, gradientDirection, imageUrl } = bg;
+
+    switch (type) {
+      case 'solid':
+        return solidColor;
+
+      case 'gradient': {
+        const [color1, color2] = gradientColors;
+        let direction;
+        switch (gradientDirection) {
+          case 'horizontal':
+            direction = 'to right';
+            break;
+          case 'vertical':
+            direction = 'to bottom';
+            break;
+          case 'diagonal':
+            direction = 'to bottom right';
+            break;
+          default:
+            direction = 'to bottom';
+        }
+        return `linear-gradient(${direction}, ${color1}, ${color2})`;
+      }
+
+      case 'image':
+        return imageUrl ? `url(${imageUrl})` : solidColor;
+
+      default:
+        return solidColor;
+    }
+  };
+
+  /**
    * Calculate board transform based on viewport state
    */
   const boardTransform = `translate(${viewport.panX}px, ${viewport.panY}px) scale(${viewport.zoom})`;
@@ -234,14 +316,27 @@ const Board = ({ placementMode, onPlacementComplete }) => {
   const cols = board.width / board.gridSize;  // 2550 / 30 = 85 columns
   const rows = board.height / board.gridSize; // 2040 / 30 = 68 rows
 
+  const boardBackground = getBoardBackground();
+  const isImageBackground = board.background.type === 'image';
+  const panEnabled = isPanningEnabled();
+  const boardClasses = [
+    'board',
+    isPanning && 'board-panning',
+    placementMode && 'board-placing',
+    !panEnabled.any && 'board-no-pan',
+  ].filter(Boolean).join(' ');
+
   return (
     <div
       ref={boardRef}
-      className={`board ${isPanning ? 'board-panning' : ''} ${placementMode ? 'board-placing' : ''}`}
+      className={boardClasses}
       style={{
         width: `${board.width}px`,
         height: `${board.height}px`,
-        backgroundColor: board.background,
+        background: boardBackground,
+        backgroundSize: isImageBackground ? 'cover' : undefined,
+        backgroundPosition: isImageBackground ? 'center' : undefined,
+        backgroundRepeat: isImageBackground ? 'no-repeat' : undefined,
         transform: boardTransform,
       }}
       onMouseDown={handleMouseDown}
@@ -253,13 +348,15 @@ const Board = ({ placementMode, onPlacementComplete }) => {
       }}
       onClick={handleClick}
     >
-      {/* Grid overlay for testing */}
-      <div 
-        className="board-grid"
-        style={{
-          backgroundSize: `${board.gridSize}px ${board.gridSize}px`,
-        }}
-      />
+      {/* Grid overlay (optional) */}
+      {board.showGrid && (
+        <div 
+          className="board-grid"
+          style={{
+            backgroundSize: `${board.gridSize}px ${board.gridSize}px`,
+          }}
+        />
+      )}
 
       {/* Shadow preview for component placement */}
       {placementMode && shadowPosition && (

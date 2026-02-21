@@ -3,6 +3,8 @@ import Viewport from './components/Viewport';
 import Board from './components/Board';
 import BoardControls from './components/BoardControls';
 import AddComponentButton from './components/AddComponentButton';
+import BoardSettingsButton from './components/BoardSettingsButton';
+import BoardSettingsDialog from './components/BoardSettingsDialog';
 import useBoardStore from './stores/useBoardStore';
 import './App.css';
 
@@ -11,10 +13,13 @@ import './App.css';
  * 
  * Phase 1A: Core Board Infrastructure
  * Phase 1B: Component placement with react-grid-layout
+ * Phase 1C: Component configuration framework
+ * Phase 1D: Board settings panel
  */
 function App() {
-  const { loadFromLocalStorage } = useBoardStore();
+  const { loadFromLocalStorage, board } = useBoardStore();
   const [placementMode, setPlacementMode] = useState(null);
+  const [showBoardSettings, setShowBoardSettings] = useState(false);
 
   // Load saved state on mount (if available)
   useEffect(() => {
@@ -56,14 +61,23 @@ function App() {
           placementMode={placementMode}
           onPlacementComplete={handlePlacementComplete}
         />
-        <BoardControls />
+        
+        {/* Conditionally show test controls */}
+        {board.showTestControls && <BoardControls />}
+        
         <AddComponentButton onSelectType={handleSelectComponentType} />
+        <BoardSettingsButton onClick={() => setShowBoardSettings(true)} />
         
         {/* Placement mode indicator */}
         {placementMode && (
           <div className="placement-mode-indicator">
             Placing component... (ESC to cancel)
           </div>
+        )}
+        
+        {/* Board settings dialog */}
+        {showBoardSettings && (
+          <BoardSettingsDialog onClose={() => setShowBoardSettings(false)} />
         )}
       </Viewport>
     </div>
