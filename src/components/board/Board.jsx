@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import useBoardStore from '../stores/useBoardStore';
-import ComponentTile from './ComponentTile';
-import { getComponentType, generateComponentId } from '../utils/componentRegistry';
-import { migrateBackgroundFormat } from '../utils/backgroundUtils';
+import useBoardStore from '../../stores/useBoardStore';
+import ComponentTile from '../tiles/ComponentTile';
+import { getComponentType, generateComponentId } from '../../utils/componentRegistry';
+import { migrateBackgroundFormat } from '../../utils/backgroundUtils';
 import './Board.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Viewport from './components/Viewport';
-import Board from './components/Board';
-import BoardControls from './components/BoardControls';
-import AddComponentButton from './components/AddComponentButton';
-import BoardSettingsButton from './components/BoardSettingsButton';
-import BoardSettingsDialog from './components/BoardSettingsDialog';
+import Viewport from './components/board/Viewport';
+import Board from './components/board/Board';
+import BoardControls from './components/board/BoardControls';
+import AddComponentButton from './components/ui/AddComponentButton';
+import BoardSettingsButton from './components/settings/BoardSettingsButton';
+import BoardSettingsDialog from './components/settings/BoardSettingsDialog';
 import useBoardStore from './stores/useBoardStore';
 import './App.css';
 

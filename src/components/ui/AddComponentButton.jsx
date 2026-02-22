@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getAvailableComponentTypes } from '../utils/componentRegistry';
+import { getAvailableComponentTypes } from '../../utils/componentRegistry';
 import './AddComponentButton.css';
 
 /**

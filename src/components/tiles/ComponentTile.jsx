@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import TestComponent from './TestComponent';
+import TestComponent from './types/TestComponent';
 import ComponentMenu from './ComponentMenu';
-import RemoveConfirmDialog from './RemoveConfirmDialog';
-import ConfigureDialog from './ConfigureDialog';
-import TestComponentConfig from './TestComponentConfig';
-import useBoardStore from '../stores/useBoardStore';
+import RemoveConfirmDialog from '../dialogs/RemoveConfirmDialog';
+import ConfigureDialog from '../dialogs/ConfigureDialog';
+import TestComponentConfig from './types/TestComponentConfig';
+import useBoardStore from '../../stores/useBoardStore';
 import './ComponentTile.css';
 
 /**

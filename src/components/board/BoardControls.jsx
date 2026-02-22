@@ -1,5 +1,5 @@
 import React from 'react';
-import useBoardStore from '../stores/useBoardStore';
+import useBoardStore from '../../stores/useBoardStore';
 import './BoardControls.css';
 
 /**
