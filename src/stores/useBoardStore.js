@@ -482,6 +482,41 @@ const useBoardStore = create((set) => ({
     // Reset to default state
     useBoardStore.getState().resetToDefault();
   },
+
+  /**
+   * Check if resizing board would push components outside bounds
+   * @param {number} newWidth - Proposed new width in pixels
+   * @param {number} newHeight - Proposed new height in pixels
+   * @returns {Array} Array of components that would be outside bounds, empty if valid
+   */
+  getComponentsOutsideBounds: (newWidth, newHeight) => {
+    const state = useBoardStore.getState();
+    const gridSize = state.board.gridSize;
+    const newCols = Math.floor(newWidth / gridSize);
+    const newRows = Math.floor(newHeight / gridSize);
+    const componentsOutside = [];
+
+    Object.values(state.components).forEach(component => {
+      const { x, y, w, h } = component.layout;
+      const rightEdge = x + w;
+      const bottomEdge = y + h;
+
+      // Check if component extends beyond new bounds
+      if (rightEdge > newCols || bottomEdge > newRows) {
+        componentsOutside.push({
+          id: component.id,
+          type: component.type,
+          name: component.content?.title || `${component.type} Component`,
+          position: { x, y },
+          size: { w, h },
+          exceedsRight: rightEdge > newCols,
+          exceedsBottom: bottomEdge > newRows,
+        });
+      }
+    });
+
+    return componentsOutside;
+  },
 }));
 
 export default useBoardStore;

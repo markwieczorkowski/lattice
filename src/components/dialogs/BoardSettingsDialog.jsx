@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import useBoardStore from '../../stores/useBoardStore';
+import BoardResizeWarningDialog from './BoardResizeWarningDialog';
 import './BoardSettingsDialog.css';
 
 /**
@@ -15,7 +16,7 @@ import './BoardSettingsDialog.css';
  * - Board Background (solid/gradient/image)
  */
 const BoardSettingsDialog = ({ onClose }) => {
-  const { board, updateBoard, uploadedImages, addUploadedImage } = useBoardStore();
+  const { board, updateBoard, uploadedImages, addUploadedImage, getComponentsOutsideBounds } = useBoardStore();
   const fileInputRef = useRef(null);
 
   // Local state for staged changes
@@ -31,6 +32,10 @@ const BoardSettingsDialog = ({ onClose }) => {
   const [gradientColor2, setGradientColor2] = useState(board.background.gradientColors[1]);
   const [gradientDirection, setGradientDirection] = useState(board.background.gradientDirection);
   const [imageUrl, setImageUrl] = useState(board.background.imageUrl);
+  
+  // State for resize warning dialog
+  const [showResizeWarning, setShowResizeWarning] = useState(false);
+  const [componentsOutside, setComponentsOutside] = useState([]);
 
   const handleCancel = () => {
     onClose();
@@ -45,7 +50,22 @@ const BoardSettingsDialog = ({ onClose }) => {
     const newWidth = Math.max(minWidth, Math.round((parseInt(width) || 2550) / board.gridSize) * board.gridSize);
     const newHeight = Math.max(minHeight, Math.round((parseInt(height) || 2040) / board.gridSize) * board.gridSize);
     
-    // Apply all settings to store
+    // Check if board size is changing
+    const sizeChanged = newWidth !== board.width || newHeight !== board.height;
+    
+    // If size is changing (especially shrinking), validate components
+    if (sizeChanged) {
+      const outsideComponents = getComponentsOutsideBounds(newWidth, newHeight);
+      
+      if (outsideComponents.length > 0) {
+        // Components would be outside bounds - show warning and abort
+        setComponentsOutside(outsideComponents);
+        setShowResizeWarning(true);
+        return;
+      }
+    }
+    
+    // Apply all settings to store (validation passed or size unchanged)
     updateBoard({
       showTestControls,
       showGrid,
@@ -325,6 +345,14 @@ const BoardSettingsDialog = ({ onClose }) => {
           </button>
         </div>
       </div>
+
+      {/* Resize Warning Dialog */}
+      {showResizeWarning && (
+        <BoardResizeWarningDialog
+          componentsOutside={componentsOutside}
+          onClose={() => setShowResizeWarning(false)}
+        />
+      )}
     </div>
   );
 };

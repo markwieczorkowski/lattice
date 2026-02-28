@@ -1,0 +1,116 @@
+.resize-warning-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  pointer-events: auto;
+}
+
+.resize-warning-dialog {
+  background-color: rgba(64, 64, 64, 0.95);
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(244, 67, 54, 0.5);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(244, 67, 54, 0.3);
+  pointer-events: auto;
+}
+
+.resize-warning-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(244, 67, 54, 0.3);
+  background-color: rgba(244, 67, 54, 0.2);
+}
+
+.resize-warning-header h2 {
+  margin: 0;
+  color: #ff6b6b;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.resize-warning-content {
+  padding: 20px;
+}
+
+.resize-warning-message {
+  color: white;
+  font-size: 16px;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.components-list {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.component-item {
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.component-item:last-child {
+  margin-bottom: 0;
+}
+
+.component-name {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.component-details {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-family: 'Courier New', monospace;
+  line-height: 1.4;
+}
+
+.resize-warning-actions {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
+}
+
+.resize-warning-btn {
+  padding: 10px 32px;
+  background-color: rgba(76, 175, 80, 0.9);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.resize-warning-btn:hover {
+  background-color: rgba(76, 175, 80, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.resize-warning-btn:active {
+  transform: translateY(0);
+}
