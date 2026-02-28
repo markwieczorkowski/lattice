@@ -7,8 +7,8 @@ import { create } from 'zustand';
 const useBoardStore = create((set) => ({
   // Board Configuration
   board: {
-    id: 'default-board',
-    name: 'My Board',
+    id: 'default-unsaved', // Special ID for unsaved default board
+    name: 'Default', // Display name for unsaved board
     width: 2550,  // pixels (85 columns × 30px = exactly divisible by gridSize)
     height: 2040, // pixels (68 rows × 30px = exactly divisible by gridSize)
     gridSize: 30, // pixels (for both columns and rows)
@@ -163,6 +163,14 @@ const useBoardStore = create((set) => ({
   // Design note: localStorage keys mirror future database structure for easy migration
   
   /**
+   * Check if current board is saved (has a real ID, not default-unsaved)
+   */
+  isCurrentBoardSaved: () => {
+    const state = useBoardStore.getState();
+    return state.board.id !== 'default-unsaved';
+  },
+
+  /**
    * Get metadata about all saved boards
    * Returns: { lastOpenedBoardId: string, boards: [{id, name, lastModified}] }
    */
@@ -171,12 +179,10 @@ const useBoardStore = create((set) => ({
     if (meta) {
       return JSON.parse(meta);
     }
-    // Return default metadata if none exists
+    // Return default metadata if none exists (no saved boards)
     return {
-      lastOpenedBoardId: 'default-board',
-      boards: [
-        { id: 'default-board', name: 'Default', lastModified: Date.now() }
-      ],
+      lastOpenedBoardId: null,
+      boards: [],
     };
   },
 
@@ -188,17 +194,71 @@ const useBoardStore = create((set) => ({
   },
 
   /**
-   * Save current board state to localStorage
-   * @param {string} boardName - Optional custom name for the board
+   * Generate unique board ID
    */
-  saveCurrentBoard: (boardName) => {
+  generateBoardId: () => {
+    return `board-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  },
+
+  /**
+   * Create new board with current state and save it
+   * @param {string} boardName - Name for the new board
+   * @returns {boolean} Success status
+   */
+  createNewBoard: (boardName) => {
+    if (!boardName || !boardName.trim()) {
+      return false;
+    }
+
+    const state = useBoardStore.getState();
+    const newBoardId = useBoardStore.getState().generateBoardId();
+    
+    // Save board data with new ID
+    const boardData = {
+      board: { ...state.board, id: newBoardId, name: boardName.trim() },
+      viewport: state.viewport,
+      components: state.components,
+      uploadedImages: state.uploadedImages,
+      lastModified: Date.now(),
+    };
+    
+    localStorage.setItem(`spatial-board-${newBoardId}`, JSON.stringify(boardData));
+
+    // Update metadata
+    const metadata = useBoardStore.getState().getBoardsMetadata();
+    metadata.boards.push({
+      id: newBoardId,
+      name: boardName.trim(),
+      lastModified: Date.now(),
+    });
+    metadata.lastOpenedBoardId = newBoardId;
+    useBoardStore.getState().setBoardsMetadata(metadata);
+
+    // Update current board to the new ID
+    set({
+      board: { ...state.board, id: newBoardId, name: boardName.trim() }
+    });
+
+    return true;
+  },
+
+  /**
+   * Save current board state to localStorage (overwrites existing)
+   * Only works if board is already saved (not default-unsaved)
+   * @returns {boolean} Success status
+   */
+  saveCurrentBoard: () => {
     const state = useBoardStore.getState();
     const boardId = state.board.id;
-    const finalName = boardName || state.board.name;
+
+    // Cannot save default-unsaved board (should use createNewBoard)
+    if (boardId === 'default-unsaved') {
+      return false;
+    }
 
     // Save board data with key pattern that mirrors future DB table
     const boardData = {
-      board: { ...state.board, name: finalName },
+      board: state.board,
       viewport: state.viewport,
       components: state.components,
       uploadedImages: state.uploadedImages,
@@ -207,28 +267,17 @@ const useBoardStore = create((set) => ({
     
     localStorage.setItem(`spatial-board-${boardId}`, JSON.stringify(boardData));
 
-    // Update metadata
+    // Update metadata timestamp
     const metadata = useBoardStore.getState().getBoardsMetadata();
     const existingBoardIndex = metadata.boards.findIndex(b => b.id === boardId);
     
     if (existingBoardIndex >= 0) {
-      // Update existing board metadata
-      metadata.boards[existingBoardIndex] = {
-        id: boardId,
-        name: finalName,
-        lastModified: Date.now(),
-      };
-    } else {
-      // Add new board to metadata
-      metadata.boards.push({
-        id: boardId,
-        name: finalName,
-        lastModified: Date.now(),
-      });
+      metadata.boards[existingBoardIndex].lastModified = Date.now();
+      metadata.lastOpenedBoardId = boardId;
+      useBoardStore.getState().setBoardsMetadata(metadata);
     }
-    
-    metadata.lastOpenedBoardId = boardId;
-    useBoardStore.getState().setBoardsMetadata(metadata);
+
+    return true;
   },
 
   /**
@@ -275,18 +324,56 @@ const useBoardStore = create((set) => ({
   },
 
   /**
+   * Reset to default unsaved board state
+   */
+  resetToDefault: () => {
+    set({
+      board: {
+        id: 'default-unsaved',
+        name: 'Default',
+        width: 2550,
+        height: 2040,
+        gridSize: 30,
+        showTestControls: true,
+        showGrid: true,
+        background: {
+          type: 'solid',
+          solidColor: '#808080',
+          gradientColors: ['#808080', '#606060'],
+          gradientDirection: 'vertical',
+          imageUrl: null,
+          imageName: null,
+        },
+        overlapMode: 'no-overlap',
+      },
+      viewport: {
+        panX: 0,
+        panY: 0,
+        zoom: 1,
+      },
+      components: {},
+      uploadedImages: {},
+    });
+  },
+
+  /**
    * Load the last opened board (called on app initialization)
    */
   loadLastBoard: () => {
     const metadata = useBoardStore.getState().getBoardsMetadata();
-    const lastBoardId = metadata.lastOpenedBoardId || 'default-board';
+    const lastBoardId = metadata.lastOpenedBoardId;
+    
+    // If no saved boards exist, stay on default-unsaved
+    if (!lastBoardId || metadata.boards.length === 0) {
+      return;
+    }
     
     // Try to load the last board
     const loaded = useBoardStore.getState().loadBoard(lastBoardId);
     
-    // If load failed, create a default board
+    // If load failed, reset to default
     if (!loaded) {
-      useBoardStore.getState().saveCurrentBoard('Default');
+      useBoardStore.getState().resetToDefault();
     }
   },
 
@@ -300,12 +387,21 @@ const useBoardStore = create((set) => ({
   },
 
   /**
-   * Delete a board (not exposed in UI yet, but available for future use)
+   * Delete a board
+   * @param {string} boardId - The ID of the board to delete
+   * @returns {boolean} Success status
    */
   deleteBoard: (boardId) => {
-    // Don't allow deleting the last board
+    const state = useBoardStore.getState();
     const metadata = useBoardStore.getState().getBoardsMetadata();
-    if (metadata.boards.length <= 1) {
+    
+    // Cannot delete default-unsaved
+    if (boardId === 'default-unsaved') {
+      return false;
+    }
+
+    // Cannot delete board that doesn't exist
+    if (!metadata.boards.find(b => b.id === boardId)) {
       return false;
     }
 
@@ -315,10 +411,13 @@ const useBoardStore = create((set) => ({
     // Update metadata
     metadata.boards = metadata.boards.filter(b => b.id !== boardId);
     
-    // If we deleted the last opened board, switch to first available
-    if (metadata.lastOpenedBoardId === boardId) {
-      metadata.lastOpenedBoardId = metadata.boards[0].id;
-      useBoardStore.getState().loadBoard(metadata.boards[0].id);
+    // If we deleted the currently active board, reset to default
+    if (state.board.id === boardId) {
+      useBoardStore.getState().resetToDefault();
+      metadata.lastOpenedBoardId = null;
+    } else if (metadata.lastOpenedBoardId === boardId) {
+      // If we deleted the last opened but not active, update to first available or null
+      metadata.lastOpenedBoardId = metadata.boards.length > 0 ? metadata.boards[0].id : null;
     }
     
     useBoardStore.getState().setBoardsMetadata(metadata);
@@ -330,23 +429,58 @@ const useBoardStore = create((set) => ({
     const oldData = localStorage.getItem('spatial-board-state');
     if (oldData && !localStorage.getItem('spatial-boards-meta')) {
       // Old format exists and new format doesn't - migrate it
-      const data = JSON.parse(oldData);
-      
-      // Create default board with old data
-      localStorage.setItem('spatial-board-default-board', oldData);
-      
-      // Create metadata
-      const metadata = {
-        lastOpenedBoardId: 'default-board',
-        boards: [
-          { id: 'default-board', name: 'Default', lastModified: Date.now() }
-        ],
-      };
-      localStorage.setItem('spatial-boards-meta', JSON.stringify(metadata));
-      
-      // Remove old format
-      localStorage.removeItem('spatial-board-state');
+      try {
+        const data = JSON.parse(oldData);
+        const migratedId = useBoardStore.getState().generateBoardId();
+        
+        // Determine name from old data or use default
+        const boardName = data.board?.name || 'Migrated Board';
+        
+        // Save as new board with unique ID
+        const migratedData = {
+          ...data,
+          board: { ...data.board, id: migratedId, name: boardName },
+          lastModified: Date.now(),
+        };
+        localStorage.setItem(`spatial-board-${migratedId}`, JSON.stringify(migratedData));
+        
+        // Create metadata
+        const metadata = {
+          lastOpenedBoardId: migratedId,
+          boards: [
+            { id: migratedId, name: boardName, lastModified: Date.now() }
+          ],
+        };
+        localStorage.setItem('spatial-boards-meta', JSON.stringify(metadata));
+        
+        // Remove old format
+        localStorage.removeItem('spatial-board-state');
+      } catch (error) {
+        console.error('Failed to migrate old board format:', error);
+        // If migration fails, just remove old data
+        localStorage.removeItem('spatial-board-state');
+      }
     }
+  },
+
+  /**
+   * Clear all storage and reset to first-use state (for testing)
+   */
+  clearAllStorage: () => {
+    // Remove all board data
+    const metadata = useBoardStore.getState().getBoardsMetadata();
+    metadata.boards.forEach(board => {
+      localStorage.removeItem(`spatial-board-${board.id}`);
+    });
+    
+    // Remove metadata
+    localStorage.removeItem('spatial-boards-meta');
+    
+    // Remove legacy format if exists
+    localStorage.removeItem('spatial-board-state');
+    
+    // Reset to default state
+    useBoardStore.getState().resetToDefault();
   },
 }));
 

@@ -20,6 +20,8 @@
   border-radius: 8px;
   width: 90%;
   max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   pointer-events: auto;
 }
@@ -67,26 +69,64 @@
   margin-bottom: 20px;
 }
 
-.load-save-label {
-  display: block;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 8px;
-}
-
-.current-board-name {
-  padding: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
+.section-title {
   color: white;
   font-size: 16px;
   font-weight: 600;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.load-save-select,
-.load-save-input {
+/* CURRENT BOARD SECTION */
+.current-board-section {
+  background-color: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.current-board-display {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.current-board-name {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.unsaved-indicator {
+  color: rgba(255, 193, 7, 1);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.current-board-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+/* DIVIDER */
+.section-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 24px 0;
+}
+
+/* SAVED BOARDS SECTION */
+.saved-boards-section {
+  background-color: rgba(100, 150, 255, 0.1);
+  border: 1px solid rgba(100, 150, 255, 0.3);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.load-save-select {
   width: 100%;
   padding: 10px 12px;
   background-color: rgba(0, 0, 0, 0.3);
@@ -96,16 +136,15 @@
   font-size: 14px;
   outline: none;
   transition: border-color 0.2s ease, background-color 0.2s ease;
+  margin-bottom: 12px;
 }
 
-.load-save-select:hover,
-.load-save-input:hover {
+.load-save-select:hover {
   border-color: rgba(255, 255, 255, 0.4);
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-.load-save-select:focus,
-.load-save-input:focus {
+.load-save-select:focus {
   border-color: rgba(100, 150, 255, 0.6);
   background-color: rgba(0, 0, 0, 0.5);
 }
@@ -115,21 +154,28 @@
   color: white;
 }
 
-.load-save-hint {
-  margin-top: 6px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
-  font-style: italic;
-}
-
-.load-save-actions {
+.saved-board-actions {
   display: flex;
   gap: 12px;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 8px;
 }
 
+.section-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+}
+
+.no-boards-message {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+/* BUTTONS */
 .load-save-btn {
   flex: 1;
   padding: 12px 24px;
@@ -147,6 +193,36 @@
   cursor: not-allowed;
 }
 
+.load-save-btn-add {
+  background-color: rgba(76, 175, 80, 0.8);
+  color: white;
+}
+
+.load-save-btn-add:hover:not(:disabled) {
+  background-color: rgba(76, 175, 80, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.load-save-btn-add:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.load-save-btn-save {
+  background-color: rgba(76, 175, 80, 0.6);
+  color: white;
+}
+
+.load-save-btn-save:hover:not(:disabled) {
+  background-color: rgba(76, 175, 80, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.load-save-btn-save:active:not(:disabled) {
+  transform: translateY(0);
+}
+
 .load-save-btn-load {
   background-color: rgba(100, 150, 255, 0.8);
   color: white;
@@ -162,17 +238,125 @@
   transform: translateY(0);
 }
 
-.load-save-btn-save {
-  background-color: rgba(76, 175, 80, 0.8);
+.load-save-btn-delete {
+  background-color: rgba(244, 67, 54, 0.8);
   color: white;
 }
 
-.load-save-btn-save:hover:not(:disabled) {
+.load-save-btn-delete:hover:not(:disabled) {
+  background-color: rgba(244, 67, 54, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+}
+
+.load-save-btn-delete:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* CONFIRMATION OVERLAY (for Add and Delete dialogs) */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  pointer-events: auto;
+}
+
+.confirmation-dialog {
+  background-color: rgba(48, 48, 48, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 24px;
+  min-width: 300px;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+}
+
+.confirmation-dialog h3 {
+  margin: 0 0 16px 0;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.board-name-input {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  color: white;
+  font-size: 16px;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.board-name-input:focus {
+  border-color: rgba(100, 150, 255, 0.6);
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.board-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.confirm-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.confirm-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.confirm-ok {
+  background-color: rgba(76, 175, 80, 0.9);
+  color: white;
+}
+
+.confirm-ok:hover:not(:disabled) {
   background-color: rgba(76, 175, 80, 1);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
 }
 
-.load-save-btn-save:active:not(:disabled) {
+.confirm-ok:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.confirm-cancel {
+  background-color: rgba(150, 150, 150, 0.8);
+  color: white;
+}
+
+.confirm-cancel:hover {
+  background-color: rgba(150, 150, 150, 1);
+  transform: translateY(-1px);
+}
+
+.confirm-cancel:active {
   transform: translateY(0);
 }

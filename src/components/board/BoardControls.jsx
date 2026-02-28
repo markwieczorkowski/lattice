@@ -10,7 +10,13 @@ import './BoardControls.css';
  * Phase 1D: Full settings panel
  */
 const BoardControls = () => {
-  const { board, viewport, resetViewport } = useBoardStore();
+  const { board, viewport, resetViewport, clearAllStorage } = useBoardStore();
+
+  const handleClearStorage = () => {
+    if (window.confirm('Clear all storage? This will delete all saved boards and reset to first-use state. This cannot be undone.')) {
+      clearAllStorage();
+    }
+  };
 
   return (
     <div className="board-controls">
@@ -22,13 +28,22 @@ const BoardControls = () => {
           <span>Pan: ({Math.round(viewport.panX)}, {Math.round(viewport.panY)})</span>
         </div>
       </div>
-      <button 
-        className="reset-button"
-        onClick={resetViewport}
-        title="Reset viewport to origin"
-      >
-        Reset View
-      </button>
+      <div className="board-controls-buttons">
+        <button 
+          className="reset-button"
+          onClick={resetViewport}
+          title="Reset viewport to origin"
+        >
+          Reset View
+        </button>
+        <button 
+          className="clear-storage-button"
+          onClick={handleClearStorage}
+          title="Clear all storage and reset to first-use state"
+        >
+          Clear Storage
+        </button>
+      </div>
     </div>
   );
 };

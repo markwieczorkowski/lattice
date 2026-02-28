@@ -29,6 +29,12 @@
   font-family: 'Courier New', monospace;
 }
 
+.board-controls-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .reset-button {
   padding: 8px 16px;
   background: #4CAF50;
@@ -39,6 +45,7 @@
   font-size: 14px;
   font-weight: 500;
   transition: background 0.2s;
+  white-space: nowrap;
 }
 
 .reset-button:hover {
@@ -47,4 +54,25 @@
 
 .reset-button:active {
   background: #3d8b40;
+}
+
+.clear-storage-button {
+  padding: 8px 16px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.clear-storage-button:hover {
+  background: #da190b;
+}
+
+.clear-storage-button:active {
+  background: #c41c0c;
 }
