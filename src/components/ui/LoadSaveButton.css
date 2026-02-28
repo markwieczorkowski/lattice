@@ -1,0 +1,34 @@
+.load-save-button {
+  position: fixed;
+  top: 20px;
+  right: 90px; /* Aligned with BoardSettingsButton (20px gap between) */
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: rgba(64, 64, 64, 0.75);
+  backdrop-filter: blur(4px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 100;
+  pointer-events: auto;
+}
+
+.load-save-button:hover {
+  background-color: rgba(80, 80, 80, 0.85);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.load-save-button:active {
+  transform: scale(0.95);
+}
+
+.load-save-icon {
+  width: 24px;
+  height: 24px;
+  color: white;
+}

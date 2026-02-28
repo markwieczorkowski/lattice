@@ -159,19 +159,84 @@ const useBoardStore = create((set) => ({
       },
     })),
 
-  // Persistence helpers (for Phase 1E)
-  saveToLocalStorage: () => {
+  // Persistence helpers (Phase 1E - Multi-board support)
+  // Design note: localStorage keys mirror future database structure for easy migration
+  
+  /**
+   * Get metadata about all saved boards
+   * Returns: { lastOpenedBoardId: string, boards: [{id, name, lastModified}] }
+   */
+  getBoardsMetadata: () => {
+    const meta = localStorage.getItem('spatial-boards-meta');
+    if (meta) {
+      return JSON.parse(meta);
+    }
+    // Return default metadata if none exists
+    return {
+      lastOpenedBoardId: 'default-board',
+      boards: [
+        { id: 'default-board', name: 'Default', lastModified: Date.now() }
+      ],
+    };
+  },
+
+  /**
+   * Update boards metadata
+   */
+  setBoardsMetadata: (metadata) => {
+    localStorage.setItem('spatial-boards-meta', JSON.stringify(metadata));
+  },
+
+  /**
+   * Save current board state to localStorage
+   * @param {string} boardName - Optional custom name for the board
+   */
+  saveCurrentBoard: (boardName) => {
     const state = useBoardStore.getState();
-    localStorage.setItem('spatial-board-state', JSON.stringify({
-      board: state.board,
+    const boardId = state.board.id;
+    const finalName = boardName || state.board.name;
+
+    // Save board data with key pattern that mirrors future DB table
+    const boardData = {
+      board: { ...state.board, name: finalName },
       viewport: state.viewport,
       components: state.components,
       uploadedImages: state.uploadedImages,
-    }));
+      lastModified: Date.now(),
+    };
+    
+    localStorage.setItem(`spatial-board-${boardId}`, JSON.stringify(boardData));
+
+    // Update metadata
+    const metadata = useBoardStore.getState().getBoardsMetadata();
+    const existingBoardIndex = metadata.boards.findIndex(b => b.id === boardId);
+    
+    if (existingBoardIndex >= 0) {
+      // Update existing board metadata
+      metadata.boards[existingBoardIndex] = {
+        id: boardId,
+        name: finalName,
+        lastModified: Date.now(),
+      };
+    } else {
+      // Add new board to metadata
+      metadata.boards.push({
+        id: boardId,
+        name: finalName,
+        lastModified: Date.now(),
+      });
+    }
+    
+    metadata.lastOpenedBoardId = boardId;
+    useBoardStore.getState().setBoardsMetadata(metadata);
   },
 
-  loadFromLocalStorage: () => {
-    const saved = localStorage.getItem('spatial-board-state');
+  /**
+   * Load a specific board by ID
+   * @param {string} boardId - The ID of the board to load
+   */
+  loadBoard: (boardId) => {
+    const saved = localStorage.getItem(`spatial-board-${boardId}`);
     if (saved) {
       const data = JSON.parse(saved);
       const defaultState = useBoardStore.getState();
@@ -198,6 +263,89 @@ const useBoardStore = create((set) => ({
         components: data.components || {},
         uploadedImages: data.uploadedImages || {},
       });
+
+      // Update last opened board in metadata
+      const metadata = useBoardStore.getState().getBoardsMetadata();
+      metadata.lastOpenedBoardId = boardId;
+      useBoardStore.getState().setBoardsMetadata(metadata);
+      
+      return true;
+    }
+    return false;
+  },
+
+  /**
+   * Load the last opened board (called on app initialization)
+   */
+  loadLastBoard: () => {
+    const metadata = useBoardStore.getState().getBoardsMetadata();
+    const lastBoardId = metadata.lastOpenedBoardId || 'default-board';
+    
+    // Try to load the last board
+    const loaded = useBoardStore.getState().loadBoard(lastBoardId);
+    
+    // If load failed, create a default board
+    if (!loaded) {
+      useBoardStore.getState().saveCurrentBoard('Default');
+    }
+  },
+
+  /**
+   * Get list of all available boards
+   * Returns: [{id, name, lastModified}]
+   */
+  getAvailableBoards: () => {
+    const metadata = useBoardStore.getState().getBoardsMetadata();
+    return metadata.boards || [];
+  },
+
+  /**
+   * Delete a board (not exposed in UI yet, but available for future use)
+   */
+  deleteBoard: (boardId) => {
+    // Don't allow deleting the last board
+    const metadata = useBoardStore.getState().getBoardsMetadata();
+    if (metadata.boards.length <= 1) {
+      return false;
+    }
+
+    // Remove from localStorage
+    localStorage.removeItem(`spatial-board-${boardId}`);
+
+    // Update metadata
+    metadata.boards = metadata.boards.filter(b => b.id !== boardId);
+    
+    // If we deleted the last opened board, switch to first available
+    if (metadata.lastOpenedBoardId === boardId) {
+      metadata.lastOpenedBoardId = metadata.boards[0].id;
+      useBoardStore.getState().loadBoard(metadata.boards[0].id);
+    }
+    
+    useBoardStore.getState().setBoardsMetadata(metadata);
+    return true;
+  },
+
+  // Legacy support - migrate old single-board format
+  migrateOldFormat: () => {
+    const oldData = localStorage.getItem('spatial-board-state');
+    if (oldData && !localStorage.getItem('spatial-boards-meta')) {
+      // Old format exists and new format doesn't - migrate it
+      const data = JSON.parse(oldData);
+      
+      // Create default board with old data
+      localStorage.setItem('spatial-board-default-board', oldData);
+      
+      // Create metadata
+      const metadata = {
+        lastOpenedBoardId: 'default-board',
+        boards: [
+          { id: 'default-board', name: 'Default', lastModified: Date.now() }
+        ],
+      };
+      localStorage.setItem('spatial-boards-meta', JSON.stringify(metadata));
+      
+      // Remove old format
+      localStorage.removeItem('spatial-board-state');
     }
   },
 }));

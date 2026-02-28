@@ -12,7 +12,6 @@ src/components/
 ├── tiles/           # Component tiles and their type implementations
 │   └── types/       # Specific component type implementations
 ├── dialogs/         # Reusable dialog components
-├── settings/        # Board settings UI
 └── ui/              # General-purpose UI elements
 ```
 
@@ -66,12 +65,15 @@ src/components/
 - `ImageComponentConfig.jsx/css` - Image configuration panel
 - ...etc
 
-### `/dialogs` - Reusable Dialog Components
+
+### `/dialogs` - Reusable Dialog Components (Updated)
 **Purpose:** Generic, reusable dialog and modal components
 
 **Files:**
 - `ConfigureDialog.jsx/css` - Base configuration dialog wrapper
 - `RemoveConfirmDialog.jsx/css` - Confirmation dialog for removal actions
+- `LoadSaveDialog.jsx/css` - Board load/save interface
+- `BoardSettingsDialog.jsx/css` - Comprehensive board settings dialog
 
 **Characteristics:**
 - Rendered via React Portal to `document.body`
@@ -80,14 +82,7 @@ src/components/
 - Dark theme with 75% opacity and backdrop blur
 - Reusable across different features
 
-### `/settings` - Board Settings UI
-**Purpose:** Board-level configuration interface
-
-**Files:**
-- `BoardSettingsButton.jsx/css` - Upper-right menu button to open settings
-- `BoardSettingsDialog.jsx/css` - Comprehensive board settings dialog
-
-**Settings Managed:**
+**Settings Managed (BoardSettingsDialog):**
 - Current board selection (placeholder for multi-board feature)
 - Test controls visibility
 - Grid visibility
@@ -101,6 +96,8 @@ src/components/
 
 **Files:**
 - `AddComponentButton.jsx/css` - Lower-right "+" button to add components
+- `LoadSaveButton.jsx/css` - Upper-right save/load button
+- `BoardSettingsButton.jsx/css` - Upper-right board settings button
 
 **Future Additions:**
 - Navigation elements
@@ -139,6 +136,8 @@ Import paths reflect logical relationships:
 // Root components import from feature folders
 import Board from './components/board/Board';
 import AddComponentButton from './components/ui/AddComponentButton';
+import BoardSettingsButton from './components/ui/BoardSettingsButton';
+import BoardSettingsDialog from './components/dialogs/BoardSettingsDialog';
 
 // Feature components import from siblings or common folders
 import ComponentTile from '../tiles/ComponentTile';
@@ -228,11 +227,10 @@ When moving files:
 - `/board` - 6 files (3 components)
 - `/tiles` - 4 files (2 components)
 - `/tiles/types` - 4 files (2 component types)
-- `/dialogs` - 4 files (2 dialogs)
-- `/settings` - 4 files (2 components)
-- `/ui` - 2 files (1 component)
+- `/dialogs` - 8 files (4 dialogs)
+- `/ui` - 6 files (3 components)
 
-**Total:** 24 files (12 components)
+**Total:** 28 files (14 components)
 
 ## Future Considerations
 
