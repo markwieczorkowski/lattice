@@ -66,7 +66,14 @@
   font-size: clamp(11px, 3.5cqw, 36px);
   line-height: 1.5;
   user-select: none;
-  padding: 1px 0;
+  padding: 1px 2px;
+  border-radius: 3px;
+  cursor: text;         /* Signal that items are clickable/editable */
+  transition: background 0.1s ease;
+}
+
+.list-component-item:hover:not(.list-component-item--adding) {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /*
@@ -96,6 +103,38 @@
   flex: 1;
   word-break: break-word;
   min-width: 0;   /* Prevents flex overflow on long words */
+}
+
+/* ── Inline add row ──────────────────────────────────────────── */
+
+/*
+ * The adding row uses the same flex layout as regular items.
+ * A subtle highlight distinguishes it as the active input row.
+ */
+.list-component-item--adding {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  margin: 0 -2px;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+.list-inline-input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;          /* Match the li's font-size, family, weight */
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+  outline: none;
+  padding: 0;
+  margin: 0;
+  /* color and caretColor applied inline to match textColor */
+}
+
+.list-inline-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
 }
 
 /* ── Empty state ─────────────────────────────────────────────── */

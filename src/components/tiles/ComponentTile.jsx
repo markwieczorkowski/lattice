@@ -6,7 +6,6 @@ import ListComponent from './types/ListComponent';
 import ComponentMenu from './ComponentMenu';
 import RemoveConfirmDialog from '../dialogs/RemoveConfirmDialog';
 import ConfigureDialog from '../dialogs/ConfigureDialog';
-import AddListItemDialog from '../dialogs/AddListItemDialog';
 import TestComponentConfig from './types/TestComponentConfig';
 import ClockComponentConfig from './types/ClockComponentConfig';
 import ListComponentConfig from './types/ListComponentConfig';
@@ -25,7 +24,7 @@ const ComponentTile = ({ component }) => {
   const { removeComponent, components, updateComponent } = useBoardStore();
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [showConfigDialog, setShowConfigDialog] = useState(false);
-  const [showQuickAddDialog, setShowQuickAddDialog] = useState(false);
+  const [isAddingListItem, setIsAddingListItem] = useState(false);
 
   const handleConfigure = () => {
     setShowConfigDialog(true);
@@ -48,9 +47,9 @@ const ComponentTile = ({ component }) => {
     setShowConfigDialog(false);
   };
 
-  // ── List quick-add ─────────────────────────────────────────────
+  // ── List inline quick-add ──────────────────────────────────────
 
-  const handleQuickAddConfirm = (text) => {
+  const handleInlineAddItem = (text) => {
     const current = components[component.id];
     const items = current?.content?.items || [];
     const newItem = {
@@ -60,7 +59,24 @@ const ComponentTile = ({ component }) => {
     updateComponent(component.id, {
       content: { ...current?.content, items: [...items, newItem] },
     });
-    setShowQuickAddDialog(false);
+    setIsAddingListItem(false);
+  };
+
+  const handleCancelInlineAdd = () => {
+    setIsAddingListItem(false);
+  };
+
+  const handleSaveEdit = (itemId, text) => {
+    const current = components[component.id];
+    const items = current?.content?.items || [];
+    // If text was cleared, treat as a cancel (don't save blank items)
+    if (!text) return;
+    const newItems = items.map((item) =>
+      item.id === itemId ? { ...item, text } : item
+    );
+    updateComponent(component.id, {
+      content: { ...current?.content, items: newItems },
+    });
   };
 
   const renderComponent = () => {
@@ -87,6 +103,10 @@ const ComponentTile = ({ component }) => {
             id={component.id}
             style={component.style}
             content={component.content}
+            isAddingItem={isAddingListItem}
+            onAddItem={handleInlineAddItem}
+            onCancelAdd={handleCancelInlineAdd}
+            onSaveEdit={handleSaveEdit}
           />
         );
       default:
@@ -115,7 +135,7 @@ const ComponentTile = ({ component }) => {
 
   const handleTileMouseDown = (e) => {
     // If any dialog is open, prevent drag
-    if (showRemoveDialog || showConfigDialog || showQuickAddDialog) {
+    if (showRemoveDialog || showConfigDialog || isAddingListItem) {
       e.stopPropagation();
       e.preventDefault();
     }
@@ -138,7 +158,7 @@ const ComponentTile = ({ component }) => {
           <button
             className="tile-quick-add-btn"
             title="Add list item"
-            onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowQuickAddDialog(true); }}
+            onClick={(e) => { e.stopPropagation(); e.preventDefault(); setIsAddingListItem(true); }}
             onMouseDown={(e) => e.stopPropagation()}
           >
             +
@@ -168,12 +188,6 @@ const ComponentTile = ({ component }) => {
         document.body
       )}
 
-      {showQuickAddDialog && (
-        <AddListItemDialog
-          onConfirm={handleQuickAddConfirm}
-          onCancel={() => setShowQuickAddDialog(false)}
-        />
-      )}
     </>
   );
 };
