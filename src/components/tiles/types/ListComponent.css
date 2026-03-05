@@ -1,0 +1,110 @@
+/* List Component — board tile */
+
+.list-component {
+  container-type: size;
+  width: 100%;
+  height: 100%;
+  border: 1px solid;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  pointer-events: auto;
+  overflow: hidden;
+  gap: 6px;
+}
+
+/* ── Title ───────────────────────────────────────────────────── */
+
+.list-component-title {
+  margin: 0;
+  font-size: clamp(14px, 5.5cqw, 56px);
+  font-weight: 700;
+  line-height: 1.2;
+  user-select: none;
+  flex-shrink: 0;
+  word-break: break-word;
+}
+
+/* ── Scrollable list area ─────────────────────────────────────── */
+
+.list-component-scroll {
+  flex: 1;
+  min-height: 0;         /* Required for flex children to scroll */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar — dark theme */
+.list-component-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.list-component-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.list-component-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+}
+.list-component-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* ── List element ────────────────────────────────────────────── */
+
+.list-component-list {
+  list-style: none;   /* Markers rendered in JSX, not by browser */
+  margin: 0;
+  padding: 0;
+}
+
+.list-component-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45em;          /* Scales with font size, always proportional */
+  font-size: clamp(11px, 3.5cqw, 36px);
+  line-height: 1.5;
+  user-select: none;
+  padding: 1px 0;
+}
+
+/*
+ * Marker spans — flex-shrink: 0 ensures they are never squashed out of view.
+ * min-width reserves consistent space so text column stays aligned across rows.
+ */
+
+.list-item-marker {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+/* Bullet: center the • in a small fixed-width slot */
+.list-item-marker--bullet {
+  min-width: 0.9em;
+  padding-left: 5px;
+  text-align: center;
+}
+
+/* Number: right-align so "1." and "10." stay flush before the text */
+.list-item-marker--numbered {
+  min-width: 1.8em;
+  text-align: right;
+}
+
+.list-item-text {
+  flex: 1;
+  word-break: break-word;
+  min-width: 0;   /* Prevents flex overflow on long words */
+}
+
+/* ── Empty state ─────────────────────────────────────────────── */
+
+.list-component-empty {
+  margin: 0;
+  font-size: clamp(10px, 3cqw, 13px);
+  font-style: italic;
+  user-select: none;
+  text-align: center;
+  padding-top: 8px;
+}

@@ -1,0 +1,336 @@
+/* List Component Config Panel */
+
+.list-component-config {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ── Section layout ─────────────────────────────────────────── */
+
+.lc-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lc-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lc-sublabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: normal;
+}
+
+/* ── Color pickers ──────────────────────────────────────────── */
+
+.lc-color-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lc-color-picker {
+  width: 60px;
+  height: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.2);
+  transition: border-color 0.15s ease;
+  flex-shrink: 0;
+}
+.lc-color-picker:hover { border-color: rgba(255, 255, 255, 0.4); }
+.lc-color-picker:focus { outline: none; border-color: #4CAF50; box-shadow: 0 0 0 3px rgba(76,175,80,0.2); }
+
+.lc-color-value {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+/* ── Opacity slider ─────────────────────────────────────────── */
+
+.lc-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, transparent, #4CAF50);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.lc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease;
+}
+.lc-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+.lc-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Text inputs ────────────────────────────────────────────── */
+
+.lc-text-input {
+  padding: 10px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 14px;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.2);
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+  width: 100%;
+}
+.lc-text-input:hover  { border-color: rgba(255, 255, 255, 0.3); }
+.lc-text-input:focus  { outline: none; border-color: #4CAF50; box-shadow: 0 0 0 3px rgba(76,175,80,0.2); }
+.lc-text-input::placeholder { color: rgba(255, 255, 255, 0.35); }
+.lc-text-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Segmented toggles (alignment, list style) ──────────────── */
+
+.lc-toggle-group {
+  display: flex;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.lc-toggle-btn {
+  flex: 1;
+  padding: 8px 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  background: rgba(0, 0, 0, 0.15);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.lc-toggle-btn + .lc-toggle-btn {
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.lc-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.lc-toggle-btn.active {
+  background: #4CAF50;
+  color: #ffffff;
+}
+
+/* ── Bullet character picker ────────────────────────────────── */
+
+.lc-bullet-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.lc-bullet-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  font-size: 18px;
+  line-height: 1;
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+}
+
+.lc-bullet-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.lc-bullet-btn.active {
+  background: rgba(76, 175, 80, 0.18);
+  border-color: #4CAF50;
+}
+
+/* ── Item list box ──────────────────────────────────────────── */
+
+.lc-item-list {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.lc-item-list::-webkit-scrollbar { width: 4px; }
+.lc-item-list::-webkit-scrollbar-track { background: transparent; }
+.lc-item-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.lc-item-empty {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  font-style: italic;
+  text-align: center;
+}
+
+.lc-item-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.1s ease;
+  user-select: none;
+}
+
+.lc-item-row:last-child {
+  border-bottom: none;
+}
+
+.lc-item-row:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.lc-item-row.selected {
+  background: rgba(76, 175, 80, 0.18);
+  border-left: 3px solid #4CAF50;
+  padding-left: 9px;
+}
+
+.lc-item-marker {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  flex-shrink: 0;
+  min-width: 18px;
+  font-family: 'Courier New', monospace;
+}
+
+.lc-item-row.selected .lc-item-marker {
+  color: #4CAF50;
+}
+
+.lc-item-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.lc-item-placeholder {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+}
+
+/* ── Edit row ───────────────────────────────────────────────── */
+
+.lc-item-edit-row {
+  margin-top: 2px;
+}
+
+.lc-item-edit-input {
+  font-size: 13px;
+}
+
+/* ── Action buttons ─────────────────────────────────────────── */
+
+.lc-item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.lc-item-actions-left {
+  display: flex;
+  gap: 6px;
+}
+
+.lc-action-btn {
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.lc-action-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.lc-action-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.lc-action-delete {
+  color: rgba(255, 100, 100, 0.85);
+  border-color: rgba(255, 100, 100, 0.3);
+  background: rgba(255, 80, 80, 0.08);
+}
+
+.lc-action-delete:hover:not(:disabled) {
+  background: rgba(255, 80, 80, 0.2);
+  color: #ff8080;
+  border-color: rgba(255, 100, 100, 0.5);
+}
+
+.lc-action-add {
+  color: #4CAF50;
+  border-color: rgba(76, 175, 80, 0.4);
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.lc-action-add:hover {
+  background: rgba(76, 175, 80, 0.22);
+  color: #6fcf72;
+  border-color: rgba(76, 175, 80, 0.6);
+}

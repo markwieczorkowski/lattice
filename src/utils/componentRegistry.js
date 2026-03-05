@@ -22,6 +22,14 @@ export const COMPONENT_TYPES = {
     minWidth: 4,      // Minimum 4 squares
     minHeight: 2,     // Minimum 2 squares
   },
+  list: {
+    id: 'list',
+    name: 'List',
+    defaultWidth: 5,  // 5 grid squares = 150px
+    defaultHeight: 6, // 6 grid squares = 180px
+    minWidth: 3,      // Minimum 3 squares
+    minHeight: 3,     // Minimum 3 squares
+  },
 };
 
 /**

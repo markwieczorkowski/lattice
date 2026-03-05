@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import TestComponent from './types/TestComponent';
 import ClockComponent from './types/ClockComponent';
+import ListComponent from './types/ListComponent';
 import ComponentMenu from './ComponentMenu';
 import RemoveConfirmDialog from '../dialogs/RemoveConfirmDialog';
 import ConfigureDialog from '../dialogs/ConfigureDialog';
+import AddListItemDialog from '../dialogs/AddListItemDialog';
 import TestComponentConfig from './types/TestComponentConfig';
 import ClockComponentConfig from './types/ClockComponentConfig';
+import ListComponentConfig from './types/ListComponentConfig';
 import useBoardStore from '../../stores/useBoardStore';
 import './ComponentTile.css';
 
@@ -19,9 +22,10 @@ import './ComponentTile.css';
  * Includes menu, configuration dialog, and remove confirmation.
  */
 const ComponentTile = ({ component }) => {
-  const { removeComponent } = useBoardStore();
+  const { removeComponent, components, updateComponent } = useBoardStore();
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [showConfigDialog, setShowConfigDialog] = useState(false);
+  const [showQuickAddDialog, setShowQuickAddDialog] = useState(false);
 
   const handleConfigure = () => {
     setShowConfigDialog(true);
@@ -44,6 +48,21 @@ const ComponentTile = ({ component }) => {
     setShowConfigDialog(false);
   };
 
+  // ── List quick-add ─────────────────────────────────────────────
+
+  const handleQuickAddConfirm = (text) => {
+    const current = components[component.id];
+    const items = current?.content?.items || [];
+    const newItem = {
+      id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      text,
+    };
+    updateComponent(component.id, {
+      content: { ...current?.content, items: [...items, newItem] },
+    });
+    setShowQuickAddDialog(false);
+  };
+
   const renderComponent = () => {
     switch (component.type) {
       case 'test':
@@ -57,6 +76,14 @@ const ComponentTile = ({ component }) => {
       case 'clock':
         return (
           <ClockComponent
+            id={component.id}
+            style={component.style}
+            content={component.content}
+          />
+        );
+      case 'list':
+        return (
+          <ListComponent
             id={component.id}
             style={component.style}
             content={component.content}
@@ -77,14 +104,18 @@ const ComponentTile = ({ component }) => {
         return (
           <ClockComponentConfig componentId={component.id} />
         );
+      case 'list':
+        return (
+          <ListComponentConfig componentId={component.id} />
+        );
       default:
         return <div>No configuration available</div>;
     }
   };
 
   const handleTileMouseDown = (e) => {
-    // If menu or dialog is open, prevent drag
-    if (showRemoveDialog || showConfigDialog) {
+    // If any dialog is open, prevent drag
+    if (showRemoveDialog || showConfigDialog || showQuickAddDialog) {
       e.stopPropagation();
       e.preventDefault();
     }
@@ -101,6 +132,19 @@ const ComponentTile = ({ component }) => {
           onConfigure={handleConfigure}
           onRemove={handleRemove}
         />
+
+        {/* Quick-add button — only rendered for list components */}
+        {component.type === 'list' && (
+          <button
+            className="tile-quick-add-btn"
+            title="Add list item"
+            onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowQuickAddDialog(true); }}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            +
+          </button>
+        )}
+
         {renderComponent()}
       </div>
 
@@ -122,6 +166,13 @@ const ComponentTile = ({ component }) => {
           {renderConfigDialog()}
         </ConfigureDialog>,
         document.body
+      )}
+
+      {showQuickAddDialog && (
+        <AddListItemDialog
+          onConfirm={handleQuickAddConfirm}
+          onCancel={() => setShowQuickAddDialog(false)}
+        />
       )}
     </>
   );
