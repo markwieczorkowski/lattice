@@ -8,6 +8,7 @@ import BoardSettingsButton from './components/ui/BoardSettingsButton';
 import BoardSettingsDialog from './components/dialogs/BoardSettingsDialog';
 import LoadSaveDialog from './components/dialogs/LoadSaveDialog';
 import useBoardStore from './stores/useBoardStore';
+import { startClockEngine, stopClockEngine } from './services/clockEngine';
 import './App.css';
 
 /**
@@ -24,6 +25,12 @@ function App() {
   const [placementMode, setPlacementMode] = useState(null);
   const [showBoardSettings, setShowBoardSettings] = useState(false);
   const [showLoadSave, setShowLoadSave] = useState(false);
+
+  // Start the monotonic clock engine once on app mount
+  useEffect(() => {
+    startClockEngine();
+    return () => stopClockEngine();
+  }, []);
 
   // Load saved state on mount (Phase 1E persistence)
   useEffect(() => {

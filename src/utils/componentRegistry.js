@@ -14,7 +14,14 @@ export const COMPONENT_TYPES = {
     minWidth: 2,      // Minimum 2 squares
     minHeight: 2,     // Minimum 2 squares
   },
-  // Future component types will be added here
+  clock: {
+    id: 'clock',
+    name: 'Digital Clock',
+    defaultWidth: 6,  // 6 grid squares = 180px
+    defaultHeight: 3, // 3 grid squares = 90px
+    minWidth: 4,      // Minimum 4 squares
+    minHeight: 2,     // Minimum 2 squares
+  },
 };
 
 /**

@@ -3,6 +3,7 @@
   height: 100%;
   position: relative;
   cursor: move;
+  box-shadow: 20px 20px 20px 0 rgba(0, 0, 0, 0.8);
 }
 
 /* Ensure resize handle is visible and properly positioned */

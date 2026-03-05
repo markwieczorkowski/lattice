@@ -1,0 +1,62 @@
+/* Clock Component — visual display tile */
+
+.clock-component {
+  container-type: size;
+  width: 100%;
+  height: 100%;
+  border: 1px solid;       /* border-color applied inline via textColor */
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  pointer-events: auto;
+  overflow: hidden;
+  gap: 2px;
+}
+
+.clock-title {
+  font-size: clamp(9px, 10cqw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  user-select: none;
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.clock-display {
+  font-family: 'Courier New', 'Lucida Console', monospace;
+  font-size: clamp(12px, min(15cqw, 40cqh), 75px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+  user-select: none;
+  white-space: nowrap;
+  line-height: 1;
+}
+  
+/*
+  .clock-display {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    font-family: 'Courier New', 'Lucida Console', monospace;
+    font-size: clamp(12px, min(80cqh, 12cqw), 152px);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-align: center;
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 1;
+  }
+  */

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import TestComponent from './types/TestComponent';
+import ClockComponent from './types/ClockComponent';
 import ComponentMenu from './ComponentMenu';
 import RemoveConfirmDialog from '../dialogs/RemoveConfirmDialog';
 import ConfigureDialog from '../dialogs/ConfigureDialog';
 import TestComponentConfig from './types/TestComponentConfig';
+import ClockComponentConfig from './types/ClockComponentConfig';
 import useBoardStore from '../../stores/useBoardStore';
 import './ComponentTile.css';
 
@@ -52,7 +54,14 @@ const ComponentTile = ({ component }) => {
             content={component.content}
           />
         );
-      // Future component types will be added here
+      case 'clock':
+        return (
+          <ClockComponent
+            id={component.id}
+            style={component.style}
+            content={component.content}
+          />
+        );
       default:
         return <div>Unknown Component Type</div>;
     }
@@ -64,7 +73,10 @@ const ComponentTile = ({ component }) => {
         return (
           <TestComponentConfig componentId={component.id} />
         );
-      // Future component types will have their own config panels
+      case 'clock':
+        return (
+          <ClockComponentConfig componentId={component.id} />
+        );
       default:
         return <div>No configuration available</div>;
     }
