@@ -52,7 +52,7 @@ npm run preview
 ## Project Structure
 
 ```
-visworkboard/
+lattice/
 ├── src/
 │   ├── components/      # React components
 │   ├── stores/          # Zustand state stores

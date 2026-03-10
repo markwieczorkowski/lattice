@@ -1,11 +1,12 @@
 {
-  "name": "visworkboard",
+  "name": "lattice",
   "version": "1.0.0",
   "description": "Spatial Board UI - A flexible, component-based workspace with spatial organization",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:synex": "vite build && rm -rf ../synex/web/dist && mkdir -p ../synex/web/dist && cp -r dist/* ../synex/web/dist/",
     "preview": "vite preview"
   },
   "keywords": ["react", "spatial-ui", "grid-layout", "workspace"],
