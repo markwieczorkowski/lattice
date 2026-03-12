@@ -50,9 +50,12 @@ function hexToRgba(hex, alpha) {
  *   style        {object}   - Visual overrides (backgroundColor, backgroundOpacity, textColor)
  *   content      {object}   - List data (title, titleAlign, listStyle, items)
  *   isAddingItem {boolean}  - When true, activates inline add at bottom of list
- *   onAddItem    {function(text)}         - Called when add is committed
- *   onCancelAdd  {function}              - Called when add is cancelled
+ *   onAddItem    {function(text)}          - Called when add is committed
+ *   onCancelAdd  {function}               - Called when add is cancelled
  *   onSaveEdit   {function(itemId, text)} - Called when an existing item edit is committed
+ *   onDeleteItem {function(itemId)}       - Called when the inline delete button is clicked
+ *   onMoveItem   {function(itemId, dir)}  - Called when move-up/down is clicked ('up' | 'down')
+ *   gridW        {number}                 - Tile width in grid squares; move buttons shown at ≥10
  */
 const ListComponent = ({
   id,
@@ -62,6 +65,9 @@ const ListComponent = ({
   onAddItem,
   onCancelAdd,
   onSaveEdit,
+  onDeleteItem,
+  onMoveItem,
+  gridW = 0,
 }) => {
   const backgroundColor   = style.backgroundColor   || '#404040';
   const backgroundOpacity = style.backgroundOpacity  ?? 0.5;
@@ -88,6 +94,19 @@ const ListComponent = ({
   // Prevents the blur handler from double-firing a cancel after Enter/Escape
   // already acted (blur always fires after a key commit when the input unmounts).
   const didCommitRef = useRef(false);
+
+  // ── Auto-cancel edit if the item being edited no longer exists ─
+  // (Fires after onDeleteItem removes the item from the store and the
+  //  parent re-renders us with an updated items array.)
+  useEffect(() => {
+    if (editingState?.type === 'edit') {
+      const stillExists = items.some((item) => item.id === editingState.itemId);
+      if (!stillExists) {
+        setEditingState(null);
+        setEditingText('');
+      }
+    }
+  }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Focus helper ──────────────────────────────────────────────
 
@@ -238,20 +257,57 @@ const ListComponent = ({
         {showList ? (
           <ul className="list-component-list">
             {items.map((item, idx) => {
-              const isEditing = editingState?.type === 'edit' && editingState.itemId === item.id;
+              const isEditing  = editingState?.type === 'edit' && editingState.itemId === item.id;
+              const showMove   = gridW >= 10;
+              const isAtTop    = idx === 0;
+              const isAtBottom = idx === items.length - 1;
+
+              // Shared mousedown handler for all inline action buttons:
+              // e.preventDefault() keeps the input focused so blur never fires.
+              const actionMouseDown = (e) => { e.preventDefault(); e.stopPropagation(); };
+
               return (
                 <li
                   key={item.id}
-                  className={`list-component-item${isEditing ? ' list-component-item--adding' : ''}`}
+                  className={`list-component-item${isEditing ? ' list-component-item--editing' : ''}`}
                   style={{ color: textColor }}
                   onMouseDown={(e) => e.stopPropagation()}
                   onClick={(e) => handleItemClick(e, item)}
                 >
                   {renderMarker(idx)}
-                  {isEditing
-                    ? renderInlineInput()
-                    : <span className="list-item-text">{item.text}</span>
-                  }
+                  {isEditing ? (
+                    <>
+                      {renderInlineInput()}
+                      <div className="list-item-edit-actions">
+                        {showMove && (
+                          <>
+                            <button
+                              className="list-item-edit-btn"
+                              title="Move item up"
+                              disabled={isAtTop}
+                              onMouseDown={actionMouseDown}
+                              onClick={(e) => { e.stopPropagation(); didCommitRef.current = true; onMoveItem?.(item.id, 'up'); didCommitRef.current = false; }}
+                            >▲</button>
+                            <button
+                              className="list-item-edit-btn"
+                              title="Move item down"
+                              disabled={isAtBottom}
+                              onMouseDown={actionMouseDown}
+                              onClick={(e) => { e.stopPropagation(); didCommitRef.current = true; onMoveItem?.(item.id, 'down'); didCommitRef.current = false; }}
+                            >▼</button>
+                          </>
+                        )}
+                        <button
+                          className="list-item-edit-btn list-item-edit-btn--delete"
+                          title="Delete item"
+                          onMouseDown={actionMouseDown}
+                          onClick={(e) => { e.stopPropagation(); didCommitRef.current = true; onDeleteItem?.(item.id); }}
+                        >✕</button>
+                      </div>
+                    </>
+                  ) : (
+                    <span className="list-item-text">{item.text}</span>
+                  )}
                 </li>
               );
             })}

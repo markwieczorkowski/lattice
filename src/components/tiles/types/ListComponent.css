@@ -105,18 +105,70 @@
   min-width: 0;   /* Prevents flex overflow on long words */
 }
 
-/* ── Inline add row ──────────────────────────────────────────── */
+/* ── Active input rows (add and edit) ────────────────────────── */
 
 /*
- * The adding row uses the same flex layout as regular items.
- * A subtle highlight distinguishes it as the active input row.
+ * Both the inline-add row and an item being edited get a subtle highlight.
+ * align-items switches to center so the action buttons sit flush with the input.
  */
-.list-component-item--adding {
+.list-component-item--adding,
+.list-component-item--editing {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 3px;
   margin: 0 -2px;
   padding-left: 2px;
   padding-right: 2px;
+  align-items: center;
+}
+
+/* ── Inline edit-action buttons ──────────────────────────────── */
+
+.list-item-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.list-item-edit-btn {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(64, 64, 64, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 8px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.list-item-edit-btn:hover:not(:disabled) {
+  background: rgba(80, 80, 80, 0.9);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+}
+
+.list-item-edit-btn:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.list-item-edit-btn:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
+/* Delete button gets a subtle red tint on hover */
+.list-item-edit-btn--delete:hover:not(:disabled) {
+  background: rgba(180, 50, 50, 0.75);
+  border-color: rgba(255, 100, 100, 0.5);
+  color: #ffffff;
 }
 
 .list-inline-input {

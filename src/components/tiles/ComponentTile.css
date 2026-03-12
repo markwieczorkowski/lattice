@@ -41,6 +41,7 @@
   transform: scale(0.95);
 }
 
+
 /* Ensure resize handle is visible and properly positioned */
 .react-grid-item > .react-resizable-handle {
   position: absolute;

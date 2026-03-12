@@ -79,6 +79,29 @@ const ComponentTile = ({ component }) => {
     });
   };
 
+  const handleDeleteItem = (itemId) => {
+    const current = components[component.id];
+    const items = current?.content?.items || [];
+    updateComponent(component.id, {
+      content: { ...current?.content, items: items.filter((item) => item.id !== itemId) },
+    });
+  };
+
+  const handleMoveItem = (itemId, direction) => {
+    const current = components[component.id];
+    const items = current?.content?.items || [];
+    const idx = items.findIndex((item) => item.id === itemId);
+    if (idx === -1) return;
+    if (direction === 'up'   && idx === 0)               return;
+    if (direction === 'down' && idx === items.length - 1) return;
+    const newItems  = [...items];
+    const swapIdx   = direction === 'up' ? idx - 1 : idx + 1;
+    [newItems[idx], newItems[swapIdx]] = [newItems[swapIdx], newItems[idx]];
+    updateComponent(component.id, {
+      content: { ...current?.content, items: newItems },
+    });
+  };
+
   const renderComponent = () => {
     switch (component.type) {
       case 'test':
@@ -107,6 +130,9 @@ const ComponentTile = ({ component }) => {
             onAddItem={handleInlineAddItem}
             onCancelAdd={handleCancelInlineAdd}
             onSaveEdit={handleSaveEdit}
+            onDeleteItem={handleDeleteItem}
+            onMoveItem={handleMoveItem}
+            gridW={component.layout?.w ?? 0}
           />
         );
       default:
